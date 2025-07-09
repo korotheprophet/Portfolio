@@ -16,6 +16,10 @@ const modelPaths = [
   "/models/Portfolio.glb", 
   "/public/model/Portfolio.glb",
   "/public/models/Portfolio.glb",
+  "/model/PortfolioV5.glb",
+  "/models/PortfolioV5.glb",
+  "/PortfolioV5.glb",
+  "/Portfolio.glb"
 ]
 
 let currentPathIndex = 0
@@ -30,91 +34,131 @@ function tryLoadModel() {
   const currentPath = modelPaths[currentPathIndex]
   console.log(`🔄 Trying to load model from: ${currentPath}`)
   
-  loader.load(
-    currentPath,
-    (glb) => {
-      console.log(`✅ Model loaded successfully from ${currentPath}`)
-      scene.add(glb.scene)
-      
-      glb.scene.traverse((child) => {
-        console.log('Found object:', child.name, 'Type:', child.type)
-        
-        // Force all objects to be visible
-        child.visible = true
-        
-        if (child.name.includes('Raycaster')) {
-          console.log('*** RAYCASTER OBJECT:', child.name, 'Type:', child.type, 'Visible:', child.visible)
-        }
-        
-        if (child.isMesh) {
-          console.log('  - Mesh details:', child.name, 'Position:', child.position, 'Scale:', child.scale)
-          
-          // Make all meshes visible and ensure proper scale
-          child.visible = true
-          child.frustumCulled = false
-          if (child.scale.x === 0 || child.scale.y === 0 || child.scale.z === 0) {
-            child.scale.set(1, 1, 1)
-          }
-          
-          // Add neon glow to existing pink materials only
-          if (child.material && child.material.color) {
-            const color = child.material.color
-            // Only modify if material is already pink (preserve original color)
-            if (color.r > 0.8 && color.g < 0.8 && color.b > 0.8) {
-              const originalColor = color.clone()
-              child.material = new THREE.MeshStandardMaterial({
-                color: originalColor,
-                emissive: originalColor.clone().multiplyScalar(0.2),
-                emissiveIntensity: 0.4
-              })
-            }
-          }
-          
-          // Make specific text elements white
-          if (child.name.includes("Text") || 
-              child.name.includes("text") ||
-              child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
-              child.name.includes("projects_Raycaster_Pointer_Hover") ||
-              child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
-              child.name.includes("contact_Raycaster_Pointer_Hover")) {
-            
-            child.material = new THREE.MeshBasicMaterial({ color: 0xffffff })
-            
-            // Only handle the four interactive button texts for raycasting
-            if (child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
-                child.name.includes("projects_Raycaster_Pointer_Hover") ||
-                child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
-                child.name.includes("contact_Raycaster_Pointer_Hover")) {
-              
-              child.userData.initialScale = new THREE.Vector3().copy(child.scale)
-              
-              const hitbox = createHitbox(child)
-              scene.add(hitbox)
-              raycasterObjects.push(hitbox)
-              hitboxToObjectMap.set(hitbox, child)
-            }
-          }
-        }
-        
-        // Make all models visible
-        if (child.isMesh && child.material) {
-          child.visible = true
-          // Preserve original materials unless they're problematic
-          if (!child.material.color || child.material.transparent === true) {
-            child.material = new THREE.MeshStandardMaterial({ color: 0x888888 })
-          }
-        }
+  // First, let's check what the server is actually returning
+  fetch(currentPath)
+    .then(response => {
+      console.log(`📊 Response for ${currentPath}:`, {
+        status: response.status,
+        contentType: response.headers.get('content-type'),
+        size: response.headers.get('content-length')
       })
-    },
-    (progress) => {
-      console.log(`Loading progress for ${currentPath}:`, (progress.loaded / progress.total * 100) + '%')
-    },
-    (error) => {
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      
+      // Check if it's actually a binary file
+      const contentType = response.headers.get('content-type')
+      if (contentType && !contentType.includes('application/octet-stream') && !contentType.includes('model/gltf-binary')) {
+        console.warn(`⚠️ Unexpected content type: ${contentType}`)
+      }
+      
+      return response.arrayBuffer()
+    })
+    .then(buffer => {
+      console.log(`📦 Buffer size: ${buffer.byteLength} bytes`)
+      
+      // Check if it looks like a GLB file (should start with "glTF")
+      const view = new Uint8Array(buffer, 0, 4)
+      const magic = String.fromCharCode(...view)
+      console.log(`🔍 File magic: "${magic}"`)
+      
+      if (magic !== 'glTF') {
+        throw new Error(`Invalid GLB file - magic is "${magic}", expected "glTF"`)
+      }
+      
+      // If we get here, try loading with GLTFLoader
+      loader.load(
+        currentPath,
+        (glb) => {
+          console.log(`✅ Model loaded successfully from ${currentPath}`)
+          scene.add(glb.scene)
+          
+          glb.scene.traverse((child) => {
+            console.log('Found object:', child.name, 'Type:', child.type)
+            
+            // Force all objects to be visible
+            child.visible = true
+            
+            if (child.name.includes('Raycaster')) {
+              console.log('*** RAYCASTER OBJECT:', child.name, 'Type:', child.type, 'Visible:', child.visible)
+            }
+            
+            if (child.isMesh) {
+              console.log('  - Mesh details:', child.name, 'Position:', child.position, 'Scale:', child.scale)
+              
+              // Make all meshes visible and ensure proper scale
+              child.visible = true
+              child.frustumCulled = false
+              if (child.scale.x === 0 || child.scale.y === 0 || child.scale.z === 0) {
+                child.scale.set(1, 1, 1)
+              }
+              
+              // Add neon glow to existing pink materials only
+              if (child.material && child.material.color) {
+                const color = child.material.color
+                // Only modify if material is already pink (preserve original color)
+                if (color.r > 0.8 && color.g < 0.8 && color.b > 0.8) {
+                  const originalColor = color.clone()
+                  child.material = new THREE.MeshStandardMaterial({
+                    color: originalColor,
+                    emissive: originalColor.clone().multiplyScalar(0.2),
+                    emissiveIntensity: 0.4
+                  })
+                }
+              }
+              
+              // Make specific text elements white
+              if (child.name.includes("Text") || 
+                  child.name.includes("text") ||
+                  child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
+                  child.name.includes("projects_Raycaster_Pointer_Hover") ||
+                  child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
+                  child.name.includes("contact_Raycaster_Pointer_Hover")) {
+                
+                child.material = new THREE.MeshBasicMaterial({ color: 0xffffff })
+                
+                // Only handle the four interactive button texts for raycasting
+                if (child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
+                    child.name.includes("projects_Raycaster_Pointer_Hover") ||
+                    child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
+                    child.name.includes("contact_Raycaster_Pointer_Hover")) {
+                  
+                  child.userData.initialScale = new THREE.Vector3().copy(child.scale)
+                  
+                  const hitbox = createHitbox(child)
+                  scene.add(hitbox)
+                  raycasterObjects.push(hitbox)
+                  hitboxToObjectMap.set(hitbox, child)
+                }
+              }
+            }
+            
+            // Make all models visible
+            if (child.isMesh && child.material) {
+              child.visible = true
+              // Preserve original materials unless they're problematic
+              if (!child.material.color || child.material.transparent === true) {
+                child.material = new THREE.MeshStandardMaterial({ color: 0x888888 })
+              }
+            }
+          })
+        },
+        (progress) => {
+          console.log(`Loading progress for ${currentPath}:`, (progress.loaded / progress.total * 100) + '%')
+        },
+        (error) => {
+          console.error(`❌ GLTFLoader failed for ${currentPath}:`, error)
+          currentPathIndex++
+          tryLoadModel() // Try next path
+        }
+      )
+    })
+    .catch(error => {
       console.error(`❌ Failed to load from ${currentPath}:`, error)
       currentPathIndex++
       tryLoadModel() // Try next path
-    }
-  )
+    })
 }
 
 function createFallbackScene() {
