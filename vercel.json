@@ -46,6 +46,19 @@
       ]
     },
     {
+      "source": "/models/Portfolio.glb",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "model/gltf-binary"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        }
+      ]
+    },
+    {
       "source": "/audio/(.*)\\.mp3$",
       "headers": [
         {

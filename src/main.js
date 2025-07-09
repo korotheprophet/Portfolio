@@ -11,8 +11,9 @@ const scene = new THREE.Scene()
 scene.background = new THREE.Color("#141414") // Changed from "#343434" to black
 
 loader.load(
-  "/models/Portfolio.glb", 
+  "/public/models/Portfolio.glb", // or "/model/Portfofolio.glb" if that's the actual filename
   (glb) => {
+    console.log('✅ Model loaded successfully from /model/Portfolio.glb')
     scene.add(glb.scene)
     
     glb.scene.traverse((child) => {
@@ -86,15 +87,15 @@ loader.load(
     })
   },
   (progress) => {
-    // Progress callback
     console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%')
   },
   (error) => {
-    // Error callback
-    console.error('Error loading 3D model:', error)
-    console.log('Make sure Portfolio.glb exists in the /models/ directory')
+    console.error('❌ Error loading 3D model:', error)
+    console.log('🔍 Attempted to load from: /model/Portfolio.glb')
+    console.log('📁 Make sure the file exists at: public/model/Portfolio.glb')
+    console.log('🌐 Check browser Network tab for 404 errors')
     
-    // Optional: Create a fallback scene or show an error message
+    // Create fallback cube
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshBasicMaterial({ color: 0xff69b4 })
     const cube = new THREE.Mesh(geometry, material)
