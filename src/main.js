@@ -94,6 +94,22 @@ loader.load(
     console.log('🔍 Attempted to load from: /model/Portfolio.glb')
     console.log('📁 Make sure the file exists at: public/model/Portfolio.glb')
     console.log('🌐 Check browser Network tab for 404 errors')
+    console.log('⚠️  The file might be corrupted or not a valid GLB file')
+    
+    // Test if file exists by fetching it
+    fetch('/model/Portfolio.glb')
+      .then(response => {
+        console.log('📊 File response status:', response.status)
+        console.log('📊 File response headers:', response.headers.get('content-type'))
+        if (!response.ok) {
+          console.log('❌ File not found or server error')
+        } else {
+          console.log('✅ File exists but may be corrupted')
+        }
+      })
+      .catch(fetchError => {
+        console.log('❌ Fetch error:', fetchError)
+      })
     
     // Create fallback cube
     const geometry = new THREE.BoxGeometry(1, 1, 1)
