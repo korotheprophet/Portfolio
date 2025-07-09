@@ -10,114 +10,153 @@ const hitboxToObjectMap = new Map()
 const scene = new THREE.Scene()
 scene.background = new THREE.Color("#141414") // Changed from "#343434" to black
 
-loader.load(
-  "/model/Portfolio.glb", // or "/model/Portfofolio.glb" if that's the actual filename
-  (glb) => {
-    console.log('✅ Model loaded successfully from /model/Portfolio.glb')
-    scene.add(glb.scene)
-    
-    glb.scene.traverse((child) => {
-      console.log('Found object:', child.name, 'Type:', child.type)
+// Try multiple possible paths for the model
+const modelPaths = [
+  "/model/Portfolio.glb",
+  "/models/Portfolio.glb", 
+  "/public/model/Portfolio.glb",
+  "/public/models/Portfolio.glb",
+]
+
+let currentPathIndex = 0
+
+function tryLoadModel() {
+  if (currentPathIndex >= modelPaths.length) {
+    console.error('❌ All model paths failed, creating fallback scene')
+    createFallbackScene()
+    return
+  }
+  
+  const currentPath = modelPaths[currentPathIndex]
+  console.log(`🔄 Trying to load model from: ${currentPath}`)
+  
+  loader.load(
+    currentPath,
+    (glb) => {
+      console.log(`✅ Model loaded successfully from ${currentPath}`)
+      scene.add(glb.scene)
       
-      // Force all objects to be visible
-      child.visible = true
-      
-      if (child.name.includes('Raycaster')) {
-        console.log('*** RAYCASTER OBJECT:', child.name, 'Type:', child.type, 'Visible:', child.visible)
-      }
-      
-      if (child.isMesh) {
-        console.log('  - Mesh details:', child.name, 'Position:', child.position, 'Scale:', child.scale)
+      glb.scene.traverse((child) => {
+        console.log('Found object:', child.name, 'Type:', child.type)
         
-        // Make all meshes visible and ensure proper scale
+        // Force all objects to be visible
         child.visible = true
-        child.frustumCulled = false
-        if (child.scale.x === 0 || child.scale.y === 0 || child.scale.z === 0) {
-          child.scale.set(1, 1, 1)
+        
+        if (child.name.includes('Raycaster')) {
+          console.log('*** RAYCASTER OBJECT:', child.name, 'Type:', child.type, 'Visible:', child.visible)
         }
         
-        // Add neon glow to existing pink materials only
-        if (child.material && child.material.color) {
-          const color = child.material.color
-          // Only modify if material is already pink (preserve original color)
-          if (color.r > 0.8 && color.g < 0.8 && color.b > 0.8) {
-            const originalColor = color.clone()
-            child.material = new THREE.MeshStandardMaterial({
-              color: originalColor,
-              emissive: originalColor.clone().multiplyScalar(0.2),
-              emissiveIntensity: 0.4
-            })
+        if (child.isMesh) {
+          console.log('  - Mesh details:', child.name, 'Position:', child.position, 'Scale:', child.scale)
+          
+          // Make all meshes visible and ensure proper scale
+          child.visible = true
+          child.frustumCulled = false
+          if (child.scale.x === 0 || child.scale.y === 0 || child.scale.z === 0) {
+            child.scale.set(1, 1, 1)
           }
-        }
-        
-        // Make specific text elements white
-        if (child.name.includes("Text") || 
-            child.name.includes("text") ||
-            child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
-            child.name.includes("projects_Raycaster_Pointer_Hover") ||
-            child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
-            child.name.includes("contact_Raycaster_Pointer_Hover")) {
           
-          child.material = new THREE.MeshBasicMaterial({ color: 0xffffff })
+          // Add neon glow to existing pink materials only
+          if (child.material && child.material.color) {
+            const color = child.material.color
+            // Only modify if material is already pink (preserve original color)
+            if (color.r > 0.8 && color.g < 0.8 && color.b > 0.8) {
+              const originalColor = color.clone()
+              child.material = new THREE.MeshStandardMaterial({
+                color: originalColor,
+                emissive: originalColor.clone().multiplyScalar(0.2),
+                emissiveIntensity: 0.4
+              })
+            }
+          }
           
-          // Only handle the four interactive button texts for raycasting
-          if (child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
+          // Make specific text elements white
+          if (child.name.includes("Text") || 
+              child.name.includes("text") ||
+              child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
               child.name.includes("projects_Raycaster_Pointer_Hover") ||
               child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
               child.name.includes("contact_Raycaster_Pointer_Hover")) {
             
-            child.userData.initialScale = new THREE.Vector3().copy(child.scale)
+            child.material = new THREE.MeshBasicMaterial({ color: 0xffffff })
             
-            const hitbox = createHitbox(child)
-            scene.add(hitbox)
-            raycasterObjects.push(hitbox)
-            hitboxToObjectMap.set(hitbox, child)
+            // Only handle the four interactive button texts for raycasting
+            if (child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
+                child.name.includes("projects_Raycaster_Pointer_Hover") ||
+                child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
+                child.name.includes("contact_Raycaster_Pointer_Hover")) {
+              
+              child.userData.initialScale = new THREE.Vector3().copy(child.scale)
+              
+              const hitbox = createHitbox(child)
+              scene.add(hitbox)
+              raycasterObjects.push(hitbox)
+              hitboxToObjectMap.set(hitbox, child)
+            }
           }
         }
-      }
-      
-      // Make all models visible
-      if (child.isMesh && child.material) {
-        child.visible = true
-        // Preserve original materials unless they're problematic
-        if (!child.material.color || child.material.transparent === true) {
-          child.material = new THREE.MeshStandardMaterial({ color: 0x888888 })
+        
+        // Make all models visible
+        if (child.isMesh && child.material) {
+          child.visible = true
+          // Preserve original materials unless they're problematic
+          if (!child.material.color || child.material.transparent === true) {
+            child.material = new THREE.MeshStandardMaterial({ color: 0x888888 })
+          }
         }
-      }
+      })
+    },
+    (progress) => {
+      console.log(`Loading progress for ${currentPath}:`, (progress.loaded / progress.total * 100) + '%')
+    },
+    (error) => {
+      console.error(`❌ Failed to load from ${currentPath}:`, error)
+      currentPathIndex++
+      tryLoadModel() // Try next path
+    }
+  )
+}
+
+function createFallbackScene() {
+  console.log('🎨 Creating fallback 3D scene...')
+  
+  // Create a simple 3D scene with interactive elements
+  const group = new THREE.Group()
+  
+  // Create interactive buttons as 3D objects
+  const buttonData = [
+    { name: 'aboutme_Raycaster_Pointer_Hover', position: [8, 10, 10], color: 0xff69b4 },
+    { name: 'projects_Raycaster_Pointer_Hover', position: [13, 10, 10], color: 0x69b4ff },
+    { name: 'workexperience_Raycaster_Pointer_Hover', position: [8, 8, 10], color: 0xb4ff69 },
+    { name: 'contact_Raycaster_Pointer_Hover', position: [13, 8, 10], color: 0xffb469 }
+  ]
+  
+  buttonData.forEach(button => {
+    const geometry = new THREE.BoxGeometry(2, 1, 0.5)
+    const material = new THREE.MeshStandardMaterial({ 
+      color: button.color,
+      emissive: button.color,
+      emissiveIntensity: 0.2
     })
-  },
-  (progress) => {
-    console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%')
-  },
-  (error) => {
-    console.error('❌ Error loading 3D model:', error)
-    console.log('🔍 Attempted to load from: /model/Portfolio.glb')
-    console.log('📁 Make sure the file exists at: public/model/Portfolio.glb')
-    console.log('🌐 Check browser Network tab for 404 errors')
-    console.log('⚠️  The file might be corrupted or not a valid GLB file')
+    const mesh = new THREE.Mesh(geometry, material)
+    mesh.position.set(...button.position)
+    mesh.name = button.name
+    mesh.userData.initialScale = new THREE.Vector3(1, 1, 1)
     
-    // Test if file exists by fetching it
-    fetch('/model/Portfolio.glb')
-      .then(response => {
-        console.log('📊 File response status:', response.status)
-        console.log('📊 File response headers:', response.headers.get('content-type'))
-        if (!response.ok) {
-          console.log('❌ File not found or server error')
-        } else {
-          console.log('✅ File exists but may be corrupted')
-        }
-      })
-      .catch(fetchError => {
-        console.log('❌ Fetch error:', fetchError)
-      })
+    const hitbox = createHitbox(mesh)
+    scene.add(hitbox)
+    raycasterObjects.push(hitbox)
+    hitboxToObjectMap.set(hitbox, mesh)
     
-    // Create fallback cube
-    const geometry = new THREE.BoxGeometry(1, 1, 1)
-    const material = new THREE.MeshBasicMaterial({ color: 0xff69b4 })
-    const cube = new THREE.Mesh(geometry, material)
-    scene.add(cube)
-  }
-)
+    group.add(mesh)
+  })
+  
+  scene.add(group)
+  console.log('✅ Fallback scene created with interactive elements')
+}
+
+// Start loading
+tryLoadModel()
 
 function createHitbox(object) {
   const box = new THREE.Box3().setFromObject(object)
@@ -258,8 +297,6 @@ controls.maxPolarAngle = Math.PI / 2 // 90 degrees (horizontal)
 controls.minPolarAngle = 0 // 0 degrees (straight up)
 // Limit zoom out distance
 controls.maxDistance = 50
-
-
 
 // Start with top view
 camera.position.set(10.5, 25, 10)
