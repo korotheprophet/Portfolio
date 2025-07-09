@@ -1,10 +1,5 @@
-
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs = require('fs');
+const path = require('path');
 
 // Simple GLB optimization script
 function optimizeGLB(inputPath, outputPath) {
@@ -28,7 +23,7 @@ function optimizeGLB(inputPath, outputPath) {
 }
 
 // Process all GLB files
-const modelDir = path.join(__dirname, 'public/model');
+const modelDir = './public/model';
 const files = fs.readdirSync(modelDir).filter(f => f.endsWith('.glb') && !f.includes('compressed'));
 
 files.forEach(file => {
