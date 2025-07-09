@@ -12,6 +12,9 @@ scene.background = new THREE.Color("#141414") // Changed from "#343434" to black
 
 // Try multiple possible paths for the model
 const modelPaths = [
+  "/model/PortfolioV1.glb",
+  "/models/PortfolioV1.glb",
+  "/PortfolioV1.glb",
   "/model/Portfolio.glb",
   "/models/Portfolio.glb", 
   "/public/model/Portfolio.glb",
