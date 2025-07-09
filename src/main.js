@@ -11,7 +11,7 @@ const scene = new THREE.Scene()
 scene.background = new THREE.Color("#141414") // Changed from "#343434" to black
 
 loader.load(
-  "/public/models/Portfolio.glb", // or "/model/Portfofolio.glb" if that's the actual filename
+  "/model/Portfolio.glb", // or "/model/Portfofolio.glb" if that's the actual filename
   (glb) => {
     console.log('✅ Model loaded successfully from /model/Portfolio.glb')
     scene.add(glb.scene)
