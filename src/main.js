@@ -12,14 +12,14 @@ scene.background = new THREE.Color("#141414") // Changed from "#343434" to black
 
 // Try multiple possible paths for the model
 const modelPaths = [
-  "/model/PortfolioV1.glb",
+  "/model/PortfolioV1.glb",  // This should work - public/model/ is served as /model/
+  "/model/Portfolio.glb",
+  "/model/PortfolioV5.glb",
   "/models/PortfolioV1.glb",
   "/PortfolioV1.glb",
-  "/model/Portfolio.glb",
   "/models/Portfolio.glb", 
   "/public/model/Portfolio.glb",
   "/public/models/Portfolio.glb",
-  "/model/PortfolioV5.glb",
   "/models/PortfolioV5.glb",
   "/PortfolioV5.glb",
   "/Portfolio.glb"
