@@ -78,8 +78,15 @@ function tryLoadModel() {
             // Force all objects to be visible
             child.visible = true
             
-            if (child.name.includes('Raycaster')) {
-              console.log('*** RAYCASTER OBJECT:', child.name, 'Type:', child.type, 'Visible:', child.visible)
+            // Log ALL objects that contain "Raycaster" or similar interactive terms
+            if (child.name.includes('Raycaster') || 
+                child.name.includes('about') || 
+                child.name.includes('project') || 
+                child.name.includes('work') || 
+                child.name.includes('contact') ||
+                child.name.includes('button') ||
+                child.name.includes('interactive')) {
+              console.log('*** POTENTIAL INTERACTIVE OBJECT:', child.name, 'Type:', child.type, 'Visible:', child.visible)
             }
             
             if (child.isMesh) {
@@ -106,9 +113,13 @@ function tryLoadModel() {
                 }
               }
               
-              // Make specific text elements white
+              // Make specific text elements white and check for interactive elements
               if (child.name.includes("Text") || 
                   child.name.includes("text") ||
+                  child.name.toLowerCase().includes("about") ||
+                  child.name.toLowerCase().includes("project") ||
+                  child.name.toLowerCase().includes("work") ||
+                  child.name.toLowerCase().includes("contact") ||
                   child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
                   child.name.includes("projects_Raycaster_Pointer_Hover") ||
                   child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
@@ -116,12 +127,16 @@ function tryLoadModel() {
                 
                 child.material = new THREE.MeshBasicMaterial({ color: 0xffffff })
                 
-                // Only handle the four interactive button texts for raycasting
-                if (child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
-                    child.name.includes("projects_Raycaster_Pointer_Hover") ||
-                    child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
-                    child.name.includes("contact_Raycaster_Pointer_Hover")) {
+                // Check for ANY interactive elements (not just the exact names)
+                if (child.name.toLowerCase().includes("about") ||
+                    child.name.toLowerCase().includes("project") ||
+                    child.name.toLowerCase().includes("work") ||
+                    child.name.toLowerCase().includes("contact") ||
+                    child.name.includes("Raycaster") ||
+                    child.name.includes("Pointer") ||
+                    child.name.includes("Hover")) {
                   
+                  console.log('🎯 ADDING TO RAYCASTER:', child.name)
                   child.userData.initialScale = new THREE.Vector3().copy(child.scale)
                   
                   const hitbox = createHitbox(child)
@@ -442,18 +457,29 @@ let currentIntersects = []
 let currentHoveredObject = null
 
 function handleRaycasterInteraction() {
-  if (currentIntersects.length > 0) {
-    const hitbox = currentIntersects[0].object
-    const object = hitboxToObjectMap.get(hitbox)
+  if (currentIntersects.length > 0 && !isModalOpen) {
+    const intersectedObject = currentIntersects[0].object
+    const originalObject = hitboxToObjectMap.get(intersectedObject)
     
-    if (object.name.includes("aboutme_Raycaster_Pointer_Hover")) {
-      showModal(modals.about)
-    } else if (object.name.includes("projects_Raycaster_Pointer_Hover")) {
-      showModal(modals.projects)
-    } else if (object.name.includes("workexperience_Raycaster_Pointer_Hover")) {
-      showModal(modals.work)
-    } else if (object.name.includes("contact_Raycaster_Pointer_Hover")) {
-      showModal(modals.contact)
+    if (originalObject) {
+      const objectName = originalObject.name.toLowerCase()
+      console.log('🖱️ Clicked on:', originalObject.name)
+      
+      if (objectName.includes("about")) {
+        console.log('Opening about modal')
+        showModal(modals.about)
+      } else if (objectName.includes("project")) {
+        console.log('Opening projects modal')
+        showModal(modals.projects)
+      } else if (objectName.includes("work") || objectName.includes("experience")) {
+        console.log('Opening work modal')
+        showModal(modals.work)
+      } else if (objectName.includes("contact")) {
+        console.log('Opening contact modal')
+        showModal(modals.contact)
+      } else {
+        console.log('⚠️ Unknown interactive object:', originalObject.name)
+      }
     }
   }
 }
