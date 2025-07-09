@@ -1,10 +1,14 @@
 import './style.scss'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { gsap } from 'gsap'
 
+// Set up the GLTFLoader with Meshopt decoder
 const loader = new GLTFLoader()
+loader.setMeshoptDecoder(MeshoptDecoder)
+
 const raycasterObjects = []
 const hitboxToObjectMap = new Map()
 const scene = new THREE.Scene()
