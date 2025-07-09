@@ -19,7 +19,7 @@
       ]
     },
     {
-      "source": "/models/(.*)\\.glb$",
+      "source": "/(.*)\\.glb$",
       "headers": [
         {
           "key": "Content-Type",
@@ -28,11 +28,20 @@
       ]
     },
     {
-      "source": "/models/(.*)\\.gltf$",
+      "source": "/(.*)\\.gltf$",
       "headers": [
         {
           "key": "Content-Type",
           "value": "model/gltf+json"
+        }
+      ]
+    },
+    {
+      "source": "/models/(.*)\\.glb$",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "model/gltf-binary"
         }
       ]
     },

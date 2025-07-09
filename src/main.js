@@ -10,79 +10,97 @@ const hitboxToObjectMap = new Map()
 const scene = new THREE.Scene()
 scene.background = new THREE.Color("#141414") // Changed from "#343434" to black
 
-loader.load("/models/Portfolio.glb", (glb) => {
-  scene.add(glb.scene)
-  
-  glb.scene.traverse((child) => {
-    console.log('Found object:', child.name, 'Type:', child.type)
+loader.load(
+  "/models/Portfolio.glb", 
+  (glb) => {
+    scene.add(glb.scene)
     
-    // Force all objects to be visible
-    child.visible = true
-    
-    if (child.name.includes('Raycaster')) {
-      console.log('*** RAYCASTER OBJECT:', child.name, 'Type:', child.type, 'Visible:', child.visible)
-    }
-    
-    if (child.isMesh) {
-      console.log('  - Mesh details:', child.name, 'Position:', child.position, 'Scale:', child.scale)
+    glb.scene.traverse((child) => {
+      console.log('Found object:', child.name, 'Type:', child.type)
       
-      // Make all meshes visible and ensure proper scale
+      // Force all objects to be visible
       child.visible = true
-      child.frustumCulled = false
-      if (child.scale.x === 0 || child.scale.y === 0 || child.scale.z === 0) {
-        child.scale.set(1, 1, 1)
+      
+      if (child.name.includes('Raycaster')) {
+        console.log('*** RAYCASTER OBJECT:', child.name, 'Type:', child.type, 'Visible:', child.visible)
       }
       
-      // Add neon glow to existing pink materials only
-      if (child.material && child.material.color) {
-        const color = child.material.color
-        // Only modify if material is already pink (preserve original color)
-        if (color.r > 0.8 && color.g < 0.8 && color.b > 0.8) {
-          const originalColor = color.clone()
-          child.material = new THREE.MeshStandardMaterial({
-            color: originalColor,
-            emissive: originalColor.clone().multiplyScalar(0.2),
-            emissiveIntensity: 0.4
-          })
+      if (child.isMesh) {
+        console.log('  - Mesh details:', child.name, 'Position:', child.position, 'Scale:', child.scale)
+        
+        // Make all meshes visible and ensure proper scale
+        child.visible = true
+        child.frustumCulled = false
+        if (child.scale.x === 0 || child.scale.y === 0 || child.scale.z === 0) {
+          child.scale.set(1, 1, 1)
         }
-      }
-      
-      // Make specific text elements white
-      if (child.name.includes("Text") || 
-          child.name.includes("text") ||
-          child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
-          child.name.includes("projects_Raycaster_Pointer_Hover") ||
-          child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
-          child.name.includes("contact_Raycaster_Pointer_Hover")) {
         
-        child.material = new THREE.MeshBasicMaterial({ color: 0xffffff })
+        // Add neon glow to existing pink materials only
+        if (child.material && child.material.color) {
+          const color = child.material.color
+          // Only modify if material is already pink (preserve original color)
+          if (color.r > 0.8 && color.g < 0.8 && color.b > 0.8) {
+            const originalColor = color.clone()
+            child.material = new THREE.MeshStandardMaterial({
+              color: originalColor,
+              emissive: originalColor.clone().multiplyScalar(0.2),
+              emissiveIntensity: 0.4
+            })
+          }
+        }
         
-        // Only handle the four interactive button texts for raycasting
-        if (child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
+        // Make specific text elements white
+        if (child.name.includes("Text") || 
+            child.name.includes("text") ||
+            child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
             child.name.includes("projects_Raycaster_Pointer_Hover") ||
             child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
             child.name.includes("contact_Raycaster_Pointer_Hover")) {
           
-          child.userData.initialScale = new THREE.Vector3().copy(child.scale)
+          child.material = new THREE.MeshBasicMaterial({ color: 0xffffff })
           
-          const hitbox = createHitbox(child)
-          scene.add(hitbox)
-          raycasterObjects.push(hitbox)
-          hitboxToObjectMap.set(hitbox, child)
+          // Only handle the four interactive button texts for raycasting
+          if (child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
+              child.name.includes("projects_Raycaster_Pointer_Hover") ||
+              child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
+              child.name.includes("contact_Raycaster_Pointer_Hover")) {
+            
+            child.userData.initialScale = new THREE.Vector3().copy(child.scale)
+            
+            const hitbox = createHitbox(child)
+            scene.add(hitbox)
+            raycasterObjects.push(hitbox)
+            hitboxToObjectMap.set(hitbox, child)
+          }
         }
       }
-    }
-    
-    // Make all models visible
-    if (child.isMesh && child.material) {
-      child.visible = true
-      // Preserve original materials unless they're problematic
-      if (!child.material.color || child.material.transparent === true) {
-        child.material = new THREE.MeshStandardMaterial({ color: 0x888888 })
+      
+      // Make all models visible
+      if (child.isMesh && child.material) {
+        child.visible = true
+        // Preserve original materials unless they're problematic
+        if (!child.material.color || child.material.transparent === true) {
+          child.material = new THREE.MeshStandardMaterial({ color: 0x888888 })
+        }
       }
-    }
-  })
-})
+    })
+  },
+  (progress) => {
+    // Progress callback
+    console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%')
+  },
+  (error) => {
+    // Error callback
+    console.error('Error loading 3D model:', error)
+    console.log('Make sure Portfolio.glb exists in the /models/ directory')
+    
+    // Optional: Create a fallback scene or show an error message
+    const geometry = new THREE.BoxGeometry(1, 1, 1)
+    const material = new THREE.MeshBasicMaterial({ color: 0xff69b4 })
+    const cube = new THREE.Mesh(geometry, material)
+    scene.add(cube)
+  }
+)
 
 function createHitbox(object) {
   const box = new THREE.Box3().setFromObject(object)
