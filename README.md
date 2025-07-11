@@ -1,14 +1,14 @@
-# 🌸 Interactive 3D Portfolio - Jedidiah Rollinas
+# Interactive 3D Portfolio - Jedidiah Rollinas
 
 A stunning, interactive 3D portfolio website featuring cherry blossom animations, ambient audio, and immersive Three.js experiences.
 
-## 🎯 Overview
+## Overview
 
 This portfolio showcases a unique blend of traditional Japanese aesthetics with modern web technologies. Built with Three.js, it features a 3D interactive environment with floating particles, fireflies, and smooth animations that create an engaging user experience.
 
-## ✨ Features
+## Features
 
-### 🎨 Visual Elements
+### Visual Elements
 - **3D Interactive Environment**: Built with Three.js for immersive navigation
 - **Cherry Blossom Animation**: Falling petals during loading and throughout the experience
 - **Particle Systems**: Floating particles and fireflies for ambient atmosphere
@@ -16,26 +16,26 @@ This portfolio showcases a unique blend of traditional Japanese aesthetics with 
 - **Glass-morphism UI**: Modern translucent interface elements
 - **Smooth Transitions**: GSAP-powered animations and camera movements
 
-### 🎵 Audio Experience
+### Audio Experience
 - **Background Music**: Auto-playing ambient soundtrack
 - **Audio Controls**: Minimalist play/pause toggle
 - **Volume Management**: Pre-configured at 30% for optimal experience
 - **Browser Compatibility**: Handles autoplay restrictions gracefully
 
-### 🖥️ User Interface
+### User Interface
 - **Loading Screen**: Animated cherry blossoms with scroll-style enter button
 - **Modal System**: File manager-style windows for different sections
 - **Responsive Design**: Optimized for desktop and mobile devices
 - **Interactive Elements**: Hover effects and click animations
 - **Custom Fonts**: NinjaNaruto font for thematic consistency
 
-### 📱 Navigation
+### Navigation
 - **Mouse Controls**: Left/right click and scroll wheel navigation
 - **Touch Support**: One and two-finger gestures for mobile
 - **Camera Limits**: Restricted vertical rotation and zoom distance
 - **Smooth Transitions**: Animated camera movements between views
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 portfolio/
@@ -66,7 +66,7 @@ portfolio/
 └── package-lock.json            # Dependency lock file
 ```
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 ### Core Technologies
 - **HTML5**: Semantic markup and structure
@@ -89,7 +89,7 @@ portfolio/
 - **SVG Icons**: Social media and UI icons
 - **Google Fonts**: Inter font family
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - Node.js (v14 or higher)
@@ -129,7 +129,7 @@ npm run build
 npm run preview
 ```
 
-## 🎵 Audio Setup
+## Audio Setup
 
 ### Adding Background Music
 1. Place your audio file in the `audio/` directory
@@ -149,7 +149,7 @@ cd audio
 - **Autoplay**: Attempts to start on page load
 - **Controls**: Minimalist play/pause button
 
-## 🎨 Customization Guide
+## Customization Guide
 
 ### Color Scheme
 Primary colors used throughout the project:
@@ -199,7 +199,7 @@ gsap.to(camera.position, {
 });
 ```
 
-## 🔧 Configuration Options
+## Configuration Options
 
 ### Camera Settings
 ```javascript
@@ -225,7 +225,7 @@ audio.volume = 0.3;
 <audio id="backgroundAudio" loop>
 ```
 
-## 📱 Browser Compatibility
+## Browser Compatibility
 
 ### Supported Browsers
 - **Chrome**: 88+ (Recommended)
@@ -245,7 +245,7 @@ audio.volume = 0.3;
 - Optimized particle counts
 - Reduced animation complexity
 
-## 🎯 Performance Optimization
+## Performance Optimization
 
 ### 3D Rendering
 - **Frustum Culling**: Enabled for off-screen objects
@@ -265,7 +265,7 @@ audio.volume = 0.3;
 - **Compression**: Optimized file sizes
 - **Lazy Loading**: Audio loads after user interaction
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -304,7 +304,7 @@ console.log('Debug mode enabled');
 scene.add(new THREE.AxesHelper(5)); // Show axes
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Static Hosting
 Compatible with:
@@ -331,7 +331,7 @@ VITE_PARTICLE_COUNT=50
 VITE_DEBUG_MODE=false
 ```
 
-## 📄 License & Credits
+## License & Credits
 
 ### Dependencies
 - **Three.js**: MIT License
@@ -350,7 +350,7 @@ When using this template:
 3. Update personal information
 4. Replace copyrighted assets
 
-## 🤝 Contributing
+## Contributing
 
 ### Development Workflow
 1. Fork the repository
@@ -370,7 +370,7 @@ When using this template:
 - Performance benchmarks
 - Accessibility compliance
 
-## 📄 License
+## License
 
 **Code**: All rights reserved. This code is proprietary and may not be copied or distributed.
 
@@ -379,10 +379,4 @@ When using this template:
 ## 📞 Support & Contact
 
 ### Contact Information
-- **Developer**: Jedidiah T. Rollinas
-- **Email**: jedidiahrollinas8245@gmail.com
-- **LinkedIn**: [Profile Link](https://www.linkedin.com/in/jedidiah-rollinas)
-
----
-
-*Built with ❤️ and lots of ☕ by Jedidiah T. Rollinas*
+- **Developer**: korotheprophet
