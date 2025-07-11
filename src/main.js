@@ -70,12 +70,16 @@ function tryLoadModel() {
         currentPath,
         (glb) => {
           console.log(`✅ Model loaded successfully from ${currentPath}`)
+          
+          // Move the entire model below the final camera position (Y: -35)
+          glb.scene.position.set(35, -60, 0) // Changed Y from -85 to -50 (below camera's -35)
+          
           scene.add(glb.scene)
           
           glb.scene.traverse((child) => {
             console.log('Found object:', child.name, 'Type:', child.type)
             
-            // Force all objects to be visible
+            // Force all objects to be visible initially
             child.visible = true
             
             // Log ALL objects that contain "Raycaster" or similar interactive terms
@@ -113,43 +117,162 @@ function tryLoadModel() {
                 }
               }
               
-              // Make specific text elements white and check for interactive elements
+              // COMPLETELY HIDE THE TEXT OBJECT - this is the main text element from your console
+              if (child.name === "Text") {
+                console.log('🚫 HIDING MAIN TEXT OBJECT:', child.name)
+                child.visible = false
+                child.material.visible = false
+                child.material.opacity = 0
+                child.material.transparent = true
+                child.scale.set(0, 0, 0) // Make it tiny as well
+                child.position.set(0, -1000, 0) // Move it far away
+                return // Skip further processing for this object
+              }
+              
+              // Hide any other potential text elements
               if (child.name.includes("Text") || 
                   child.name.includes("text") ||
                   child.name.toLowerCase().includes("about") ||
                   child.name.toLowerCase().includes("project") ||
                   child.name.toLowerCase().includes("work") ||
                   child.name.toLowerCase().includes("contact") ||
-                  child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
+                  child.name.toLowerCase().includes("experience") ||
+                  child.name.includes("Label") ||
+                  child.name.includes("label") ||
+                  child.name.includes("Title") ||
+                  child.name.includes("title") ||
+                  child.name.includes("Button") ||
+                  child.name.includes("button") ||
+                  child.name.includes("UI") ||
+                  child.name.includes("ui")) {
+                
+                console.log('🚫 HIDING TEXT/UI ELEMENT:', child.name)
+                child.visible = false
+                if (child.material) {
+                  child.material.visible = false
+                  child.material.opacity = 0
+                  child.material.transparent = true
+                }
+                child.scale.set(0, 0, 0)
+                child.position.set(0, -1000, 0)
+                return // Skip further processing
+              }
+              
+              // SPECIAL HANDLING FOR SCROLL OBJECT - Make it interactive with pink glow
+              if (child.name === "Scroll_Scroll_0") {
+                console.log('📜 SETTING UP SCROLL OBJECT WITH PINK GLOW:', child.name)
+                console.log('📍 Scroll position:', child.position)
+                
+                // Ensure the scroll is visible and properly positioned
+                child.visible = true
+                child.frustumCulled = false
+                
+                // Store original material properties
+                child.userData.originalMaterial = child.material.clone()
+                child.userData.initialScale = new THREE.Vector3().copy(child.scale)
+                
+                // Create a pink glow material for hover state
+                child.userData.glowMaterial = new THREE.MeshStandardMaterial({
+                  color: child.material.color,
+                  emissive: new THREE.Color(0xff69b4), // Pink glow
+                  emissiveIntensity: 0.5,
+                  transparent: true,
+                  opacity: 1
+                })
+                
+                // Create a larger hitbox for easier clicking
+                const scrollHitbox = createScrollHitbox(child)
+                scene.add(scrollHitbox)
+                raycasterObjects.push(scrollHitbox)
+                hitboxToObjectMap.set(scrollHitbox, child)
+                
+                // Mark this as a special scroll object
+                child.userData.isScrollObject = true
+                
+                console.log('✅ Scroll object setup complete with hitbox')
+              }
+              
+              // Keep interactive hitboxes but make them invisible
+              else if (child.name.includes("aboutme_Raycaster_Pointer_Hover") ||
                   child.name.includes("projects_Raycaster_Pointer_Hover") ||
                   child.name.includes("workexperience_Raycaster_Pointer_Hover") ||
-                  child.name.includes("contact_Raycaster_Pointer_Hover")) {
+                  child.name.includes("contact_Raycaster_Pointer_Hover") ||
+                  child.name.includes("Raycaster") ||
+                  child.name.includes("Pointer") ||
+                  child.name.includes("Hover") ||
+                  child.name.includes("Interactive") ||
+                  child.name.includes("Clickable") ||
+                  child.name.includes("Hitbox")) {
                 
-                child.material = new THREE.MeshBasicMaterial({ color: 0xffffff })
+                console.log('🎯 ADDING INVISIBLE HITBOX TO RAYCASTER:', child.name)
                 
-                // Check for ANY interactive elements (not just the exact names)
-                if (child.name.toLowerCase().includes("about") ||
-                    child.name.toLowerCase().includes("project") ||
-                    child.name.toLowerCase().includes("work") ||
-                    child.name.toLowerCase().includes("contact") ||
-                    child.name.includes("Raycaster") ||
-                    child.name.includes("Pointer") ||
-                    child.name.includes("Hover")) {
+                // Make the hitbox invisible but keep it functional
+                child.visible = false
+                child.material = new THREE.MeshBasicMaterial({ 
+                  transparent: true, 
+                  opacity: 0,
+                  visible: false 
+                })
+                
+                child.userData.initialScale = new THREE.Vector3().copy(child.scale)
+                
+                const hitbox = createHitbox(child)
+                scene.add(hitbox)
+                raycasterObjects.push(hitbox)
+                hitboxToObjectMap.set(hitbox, child)
+              }
+              
+              // Since the "Text" object contains all the text elements, create interactive zones
+              // based on the known position from your console output
+              else if (child.name === "Text") {
+                console.log('🎯 CREATING INTERACTIVE AREAS BASED ON TEXT POSITION')
+                
+                // The text object is at position x: 13.17, y: 9.56, z: 10.13
+                // Create 4 interactive zones around this area
+                const basePosition = new THREE.Vector3(13.17, 9.56, 10.13)
+                
+                const zones = [
+                  { name: 'aboutme_zone', offset: { x: -3, y: 2, z: 0 } },
+                  { name: 'projects_zone', offset: { x: 3, y: 2, z: 0 } },
+                  { name: 'workexperience_zone', offset: { x: -3, y: -2, z: 0 } },
+                  { name: 'contact_zone', offset: { x: 3, y: -2, z: 0 } }
+                ]
+                
+                zones.forEach(zone => {
+                  const zoneGeometry = new THREE.BoxGeometry(2, 1.5, 1)
+                  const zoneMaterial = new THREE.MeshBasicMaterial({ 
+                    transparent: true, 
+                    opacity: 0,
+                    visible: false 
+                  })
+                  const zoneMesh = new THREE.Mesh(zoneGeometry, zoneMaterial)
                   
-                  console.log('🎯 ADDING TO RAYCASTER:', child.name)
-                  child.userData.initialScale = new THREE.Vector3().copy(child.scale)
+                  zoneMesh.position.set(
+                    basePosition.x + zone.offset.x,
+                    basePosition.y + zone.offset.y,
+                    basePosition.z + zone.offset.z
+                  )
+                  zoneMesh.name = zone.name
+                  zoneMesh.visible = false
+                  zoneMesh.userData.initialScale = new THREE.Vector3(1, 1, 1)
                   
-                  const hitbox = createHitbox(child)
+                  const hitbox = createHitbox(zoneMesh)
                   scene.add(hitbox)
                   raycasterObjects.push(hitbox)
-                  hitboxToObjectMap.set(hitbox, child)
-                }
+                  hitboxToObjectMap.set(hitbox, zoneMesh)
+                  
+                  scene.add(zoneMesh)
+                  console.log(`📍 Created interactive zone: ${zone.name} at position:`, zoneMesh.position)
+                })
               }
             }
             
-            // Make all models visible
-            if (child.isMesh && child.material) {
-              child.visible = true
+            // Make all other models visible except text elements
+            if (child.isMesh && child.material && child.name !== "Text") {
+              // Don't override visibility if we already set it to false for text
+              if (child.visible !== false) {
+                child.visible = true
+              }
               // Preserve original materials unless they're problematic
               if (!child.material.color || child.material.transparent === true) {
                 child.material = new THREE.MeshStandardMaterial({ color: 0x888888 })
@@ -180,12 +303,12 @@ function createFallbackScene() {
   // Create a simple 3D scene with interactive elements
   const group = new THREE.Group()
   
-  // Create interactive buttons as 3D objects
+  // Create interactive buttons as 3D objects - moved to new Y position
   const buttonData = [
-    { name: 'aboutme_Raycaster_Pointer_Hover', position: [8, 10, 10], color: 0xff69b4 },
-    { name: 'projects_Raycaster_Pointer_Hover', position: [13, 10, 10], color: 0x69b4ff },
-    { name: 'workexperience_Raycaster_Pointer_Hover', position: [8, 8, 10], color: 0xb4ff69 },
-    { name: 'contact_Raycaster_Pointer_Hover', position: [13, 8, 10], color: 0xffb469 }
+    { name: 'aboutme_Raycaster_Pointer_Hover', position: [33, -78, 10], color: 0xff69b4 },     // Y changed from -43 to -78
+    { name: 'projects_Raycaster_Pointer_Hover', position: [38, -78, 10], color: 0x69b4ff },    // Y changed from -43 to -78
+    { name: 'workexperience_Raycaster_Pointer_Hover', position: [33, -80, 10], color: 0xb4ff69 }, // Y changed from -45 to -80
+    { name: 'contact_Raycaster_Pointer_Hover', position: [38, -80, 10], color: 0xffb469 }      // Y changed from -45 to -80
   ]
   
   buttonData.forEach(button => {
@@ -226,6 +349,29 @@ function createHitbox(object) {
   
   hitbox.position.copy(center)
   hitbox.userData.originalObject = object
+  
+  return hitbox
+}
+
+function createScrollHitbox(scrollObject) {
+  // Create a larger, more accessible hitbox for the scroll
+  const hitboxGeometry = new THREE.BoxGeometry(3, 3, 3) // Larger than default
+  const hitboxMaterial = new THREE.MeshBasicMaterial({ 
+    transparent: true, 
+    opacity: 0,
+    visible: false 
+  })
+  const hitbox = new THREE.Mesh(hitboxGeometry, hitboxMaterial)
+  
+  // Position the hitbox at the scroll's world position
+  const worldPosition = new THREE.Vector3()
+  scrollObject.getWorldPosition(worldPosition)
+  hitbox.position.copy(worldPosition)
+  
+  hitbox.userData.originalObject = scrollObject
+  hitbox.name = 'scroll_hitbox'
+  
+  console.log('📦 Created scroll hitbox at position:', hitbox.position)
   
   return hitbox
 }
@@ -299,14 +445,14 @@ class Firefly {
     this.light = new THREE.PointLight(0xffff88, 1, 5)
     
     this.position = new THREE.Vector3(
-      10.5 + (Math.random() - 0.5) * 20,
-      5 + Math.random() * 10,
+      35 + (Math.random() - 0.5) * 20,  // Keep X position at 35
+      -55 + Math.random() * 5,          // Updated Y to match model at -60 (range -60 to -55, staying above model)
       10 + (Math.random() - 0.5) * 20
     )
     this.velocity = new THREE.Vector3(
-      (Math.random() - 0.5) * 0.02,
-      (Math.random() - 0.5) * 0.01,
-      (Math.random() - 0.5) * 0.02
+      (Math.random() - 0.5) * 0.015,    // Increased from 0.005 to 0.015
+      (Math.random() - 0.5) * 0.008,   // Increased from 0.002 to 0.008
+      (Math.random() - 0.5) * 0.015    // Increased from 0.005 to 0.015
     )
     this.blinkTimer = Math.random() * Math.PI * 2
   }
@@ -315,10 +461,10 @@ class Firefly {
     this.position.add(this.velocity)
     this.blinkTimer += 0.05
     
-    // Keep near model
-    const center = new THREE.Vector3(10.5, 9, 10)
+    // Keep near model - updated center position Y to -60
+    const center = new THREE.Vector3(35, -55, 10) // Model center position with Y at -60
     if (this.position.distanceTo(center) > 15) {
-      this.velocity.add(center.clone().sub(this.position).normalize().multiplyScalar(0.001))
+      this.velocity.add(center.clone().sub(this.position).normalize().multiplyScalar(0.0002)) // Much slower attraction - reduced from 0.0005 to 0.0002
     }
     
     this.mesh.position.copy(this.position)
@@ -339,7 +485,7 @@ for (let i = 0; i < 50; i++) {
 }
 
 const fireflies = []
-for (let i = 0; i < 35; i++) {
+for (let i = 0; i < 80; i++) {  // Increased from 35 to 80
   const firefly = new Firefly()
   fireflies.push(firefly)
   scene.add(firefly.mesh)
@@ -352,20 +498,33 @@ controls.dampingFactor = 0.05
 // Limit vertical rotation - prevent looking below the model
 controls.maxPolarAngle = Math.PI / 2 // 90 degrees (horizontal)
 controls.minPolarAngle = 0 // 0 degrees (straight up)
-// Limit zoom out distance
-controls.maxDistance = 50
+// Increase zoom out distance for better view
+controls.maxDistance = 100 // Increased from 50 to 100
+controls.minDistance = 10  // Set minimum distance to prevent getting too close
 
-// Start with top view
-camera.position.set(10.5, 25, 10)
-controls.target.set(10.5, 9, 10)
+// Start with top view - adjusted for new model positioning
+camera.position.set(35, 35, 10) // Keep camera above the model
+controls.target.set(35, -35, 10) // Target moved to new model position Y -50
 controls.update()
 
-// Smooth transition to front view after loading
+// Smooth transition to front view after loading - ADJUSTED HEIGHT AND ZOOM
 function transitionToFrontView() {
   gsap.to(camera.position, {
-    x: 10.5,
-    y: 9,
-    z: 30,
+    x: 35,    // Keep X position
+    y: -20,   // Keep camera position
+    z: 60,    // Keep zoom
+    duration: 3,
+    ease: "power2.inOut",
+    onUpdate: () => {
+      controls.update()
+    }
+  })
+  
+  // Update target to new model position
+  gsap.to(controls.target, {
+    x: 35,    // Keep X position
+    y: -50,   // Target moved to new model position Y -50
+    z: 10,
     duration: 3,
     ease: "power2.inOut",
     onUpdate: () => {
@@ -396,6 +555,7 @@ window.addEventListener("resize", () => {
 
 // Modal functionality
 const modals = {
+  main: document.querySelector(".modal.main"),
   work: document.querySelector(".modal.work"),
   about: document.querySelector(".modal.about"),
   projects: document.querySelector(".modal.projects"),
@@ -464,8 +624,15 @@ function handleRaycasterInteraction() {
     if (originalObject) {
       const objectName = originalObject.name.toLowerCase()
       console.log('🖱️ Clicked on:', originalObject.name)
+      console.log('📍 Object position:', originalObject.position)
       
-      if (objectName.includes("about")) {
+      // Handle scroll click - open main page (multiple ways to detect scroll)
+      if (objectName.includes("scroll") || 
+          originalObject.userData.isScrollObject ||
+          objectName === "scroll_scroll_0") {
+        console.log('📜 Opening main page from scroll')
+        showModal(modals.main)
+      } else if (objectName.includes("about")) {
         console.log('Opening about modal')
         showModal(modals.about)
       } else if (objectName.includes("project")) {
@@ -479,6 +646,8 @@ function handleRaycasterInteraction() {
         showModal(modals.contact)
       } else {
         console.log('⚠️ Unknown interactive object:', originalObject.name)
+        // Try opening main modal as fallback for any unrecognized interactive object
+        showModal(modals.main)
       }
     }
   }
@@ -486,24 +655,68 @@ function handleRaycasterInteraction() {
 
 function playHoverAnimation(objectHitbox, isHovering) {
   const object = hitboxToObjectMap.get(objectHitbox)
+  
+  if (!object) return
+  
   gsap.killTweensOf(object.scale)
   
-  if (isHovering) {
-    gsap.to(object.scale, {
-      x: object.userData.initialScale.x * 1.2,
-      y: object.userData.initialScale.y * 1.2,
-      z: object.userData.initialScale.z * 1.2,
-      duration: 0.3,
-      ease: "back.out(2)"
-    })
+  // Special handling for scroll object
+  if (object.userData.isScrollObject) {
+    if (isHovering) {
+      // Apply pink glow material
+      object.material = object.userData.glowMaterial
+      
+      // Scale animation
+      gsap.to(object.scale, {
+        x: object.userData.initialScale.x * 1.15,
+        y: object.userData.initialScale.y * 1.15,
+        z: object.userData.initialScale.z * 1.15,
+        duration: 0.3,
+        ease: "back.out(2)"
+      })
+      
+      // Animate the glow intensity
+      gsap.to(object.material, {
+        emissiveIntensity: 0.8,
+        duration: 0.3,
+        ease: "power2.out"
+      })
+      
+      console.log('📜 Scroll hover ON - Pink glow activated')
+    } else {
+      // Restore original material
+      object.material = object.userData.originalMaterial
+      
+      // Scale back to normal
+      gsap.to(object.scale, {
+        x: object.userData.initialScale.x,
+        y: object.userData.initialScale.y,
+        z: object.userData.initialScale.z,
+        duration: 0.3,
+        ease: "back.out(2)"
+      })
+      
+      console.log('📜 Scroll hover OFF - Original material restored')
+    }
   } else {
-    gsap.to(object.scale, {
-      x: object.userData.initialScale.x,
-      y: object.userData.initialScale.y,
-      z: object.userData.initialScale.z,
-      duration: 0.3,
-      ease: "back.out(2)"
-    })
+    // Regular hover animation for other objects
+    if (isHovering) {
+      gsap.to(object.scale, {
+        x: object.userData.initialScale.x * 1.2,
+        y: object.userData.initialScale.y * 1.2,
+        z: object.userData.initialScale.z * 1.2,
+        duration: 0.3,
+        ease: "back.out(2)"
+      })
+    } else {
+      gsap.to(object.scale, {
+        x: object.userData.initialScale.x,
+        y: object.userData.initialScale.y,
+        z: object.userData.initialScale.z,
+        duration: 0.3,
+        ease: "back.out(2)"
+      })
+    }
   }
 }
 
@@ -527,11 +740,19 @@ function animate() {
     const intersects = raycaster.intersectObjects(raycasterObjects)
     
     if (intersects.length > 0) {
-      if (currentHoveredObject !== intersects[0].object) {
+      const hitObject = intersects[0].object
+      const originalObject = hitboxToObjectMap.get(hitObject)
+      
+      if (currentHoveredObject !== hitObject) {
         if (currentHoveredObject) playHoverAnimation(currentHoveredObject, false)
-        currentHoveredObject = intersects[0].object
+        currentHoveredObject = hitObject
         playHoverAnimation(currentHoveredObject, true)
         document.body.style.cursor = "pointer"
+        
+        // Debug log for scroll detection
+        if (originalObject && originalObject.name.includes("Scroll")) {
+          console.log('🎯 Hovering over scroll object:', originalObject.name)
+        }
       }
       currentIntersects = intersects
     } else {

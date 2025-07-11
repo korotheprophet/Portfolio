@@ -292,9 +292,9 @@ controls.update()
 // Smooth transition to front view after loading
 function transitionToFrontView() {
   const startPos = camera.position.clone()
-  const endPos = new THREE.Vector3(10.5, 15, 25)
+  const endPos = new THREE.Vector3(10.5, 2, 25) // Changed Y from 15 to 2 for bottom center
   const startTarget = controls.target.clone()
-  const endTarget = new THREE.Vector3(10.5, 9, 10)
+  const endTarget = new THREE.Vector3(10.5, 2, 10) // Changed Y from 9 to 2 for bottom center
   
   let progress = 0
   const duration = 3000
