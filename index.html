@@ -1084,6 +1084,16 @@
 </head>
 
 <body>
+  <script>
+    // Disable all console output in production
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      console.log = function() {};
+      console.warn = function() {};
+      console.error = function() {};
+      console.info = function() {};
+      console.debug = function() {};
+    }
+  </script>
   <!-- Cherry Blossoms (persistent) -->
   <div id="cherry-blossoms"></div>
   <!-- Main Page Modal -->
@@ -1373,8 +1383,6 @@
 
 
 <script>
-// ... existing code
-
 // Navigation functions for main page buttons
 function openProjectsFromMain() {
   const mainModal = document.querySelector('.modal.main');
@@ -1415,11 +1423,34 @@ function openContactFromMain() {
   });
 }
 
-// ... existing code
+// Modified download function to prevent actual download
+function downloadResume() {
+  // Instead of downloading, show a message or do nothing
+  console.log('Resume download is currently disabled');
+  
+  // Optional: Show a notification that download is disabled
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = 'Resume download is currently unavailable.';
+  notification.style.display = 'block';
+  notification.classList.add('show');
+  document.body.appendChild(notification);
+  
+  // Remove notification after 3 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    notification.classList.add('hide');
+    setTimeout(() => {
+      if (notification.parentNode) {
+        document.body.removeChild(notification);
+      }
+    }, 500);
+  }, 3000);
+}
 </script>
 
 <script>
-// Close modals when clicking outside
+// Close modals when clicking outside - FIXED VERSION
 window.addEventListener('click', function(event) {
   const resumeModal = document.getElementById('resumeModal');
   const downloadModal = document.getElementById('downloadSuccess');
@@ -1440,41 +1471,56 @@ window.addEventListener('click', function(event) {
     closeDownloadSuccess();
   }
   
-  // Check if clicking outside main modal
-  if (mainModal && mainModal.style.display === 'block' && !mainModal.querySelector('.main-page-container').contains(event.target)) {
-    flashTransition(mainModal, () => {
-      mainModal.style.display = 'none';
-      if (overlay) overlay.style.display = 'none';
-    });
+  // Check if clicking outside main modal - FIXED: use .main-content-wrapper instead of .file-manager
+  if (mainModal && mainModal.style.display === 'block') {
+    const mainContent = mainModal.querySelector('.main-content-wrapper');
+    if (mainContent && !mainContent.contains(event.target)) {
+      flashTransition(mainModal, () => {
+        mainModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
   }
   
   // Check if clicking outside other modals (work, about, projects, contact)
-  if (workModal && workModal.style.display === 'block' && !workModal.querySelector('.file-manager').contains(event.target)) {
-    flashTransition(workModal, () => {
-      workModal.style.display = 'none';
-      if (overlay) overlay.style.display = 'none';
-    });
+  if (workModal && workModal.style.display === 'block') {
+    const workContent = workModal.querySelector('.file-manager');
+    if (workContent && !workContent.contains(event.target)) {
+      flashTransition(workModal, () => {
+        workModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
   }
   
-  if (aboutModal && aboutModal.style.display === 'block' && !aboutModal.querySelector('.file-manager').contains(event.target)) {
-    flashTransition(aboutModal, () => {
-      aboutModal.style.display = 'none';
-      if (overlay) overlay.style.display = 'none';
-    });
+  if (aboutModal && aboutModal.style.display === 'block') {
+    const aboutContent = aboutModal.querySelector('.file-manager');
+    if (aboutContent && !aboutContent.contains(event.target)) {
+      flashTransition(aboutModal, () => {
+        aboutModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
   }
   
-  if (projectsModal && projectsModal.style.display === 'block' && !projectsModal.querySelector('.file-manager').contains(event.target)) {
-    flashTransition(projectsModal, () => {
-      projectsModal.style.display = 'none';
-      if (overlay) overlay.style.display = 'none';
-    });
+  if (projectsModal && projectsModal.style.display === 'block') {
+    const projectsContent = projectsModal.querySelector('.file-manager');
+    if (projectsContent && !projectsContent.contains(event.target)) {
+      flashTransition(projectsModal, () => {
+        projectsModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
   }
   
-  if (contactModal && contactModal.style.display === 'block' && !contactModal.querySelector('.file-manager').contains(event.target)) {
-    flashTransition(contactModal, () => {
-      contactModal.style.display = 'none';
-      if (overlay) overlay.style.display = 'none';
-    });
+  if (contactModal && contactModal.style.display === 'block') {
+    const contactContent = contactModal.querySelector('.file-manager');
+    if (contactContent && !contactContent.contains(event.target)) {
+      flashTransition(contactModal, () => {
+        contactModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
   }
 });
 </script>
@@ -1500,17 +1546,17 @@ window.addEventListener('click', function(event) {
   </div>
 
   <div class="modal work">
-    <div class="file-manager">
-      <div class="title-bar">
-      </div>
-      
-      <div class="content-area">
-        <div class="document-icon" onclick="downloadResume()"></div>
-        <div class="resume-label">Resume is not the latest version.</div>
-      </div>
+  <div class="file-manager">
+    <div class="title-bar">
     </div>
-    <div style="text-align: center; color: #888; font-size: 12px; margin-top: 10px; font-family: 'NinjaNaruto', Georgia, serif;">Click anywhere outside to close</div>
+    
+    <div class="content-area">
+      <div class="document-icon" onclick="downloadResume()"></div>
+      <div class="resume-label">Resume preview only - Download unavailable</div>
+    </div>
   </div>
+  <div style="text-align: center; color: #888; font-size: 12px; margin-top: 10px; font-family: 'NinjaNaruto', Georgia, serif;">Click anywhere outside to close</div>
+</div>
 
   <div class="modal about">
     <div class="file-manager">
@@ -1785,79 +1831,103 @@ document.getElementById('enter-button').addEventListener('click', () => {
       document.getElementById('downloadSuccess').style.display = 'none';
     }
     
-    // Circle blink flash transition function
-    function flashTransition(modal, callback) {
-      const container = modal.querySelector('.file-manager') || modal.querySelector('.main-page-container');
-      if (!container) return callback();
-      
-      const flash = document.createElement('div');
-      flash.className = 'modal-flash';
-      container.style.position = 'relative';
-      container.style.overflow = 'hidden';
-      container.appendChild(flash);
-      
-      // Trigger circle expansion
-      setTimeout(() => flash.classList.add('active'), 10);
-      
-      // Execute callback and remove flash
-      setTimeout(() => {
-        if (callback) callback();
-        setTimeout(() => {
-          if (flash.parentNode) flash.parentNode.removeChild(flash);
-        }, 50);
-      }, 120);
+    // Circle blink flash transition function - UPDATED to handle different container types
+function flashTransition(modal, callback) {
+  const container = modal.querySelector('.file-manager') || modal.querySelector('.main-content-wrapper');
+  if (!container) return callback();
+  
+  const flash = document.createElement('div');
+  flash.className = 'modal-flash';
+  container.style.position = 'relative';
+  container.style.overflow = 'hidden';
+  container.appendChild(flash);
+  
+  // Trigger circle expansion
+  setTimeout(() => flash.classList.add('active'), 10);
+  
+  // Execute callback and remove flash
+  setTimeout(() => {
+    if (callback) callback();
+    setTimeout(() => {
+      if (flash.parentNode) flash.parentNode.removeChild(flash);
+    }, 50);
+  }, 120);
+}
+// Close modals when clicking outside - FIXED VERSION
+window.addEventListener('click', function(event) {
+  const resumeModal = document.getElementById('resumeModal');
+  const downloadModal = document.getElementById('downloadSuccess');
+  const mainModal = document.querySelector('.modal.main');
+  const workModal = document.querySelector('.modal.work');
+  const aboutModal = document.querySelector('.modal.about');
+  const projectsModal = document.querySelector('.modal.projects');
+  const contactModal = document.querySelector('.modal.contact');
+  const overlay = document.querySelector('.overlay');
+  
+  // Check if clicking outside resume modal
+  if (event.target === resumeModal) {
+    closeResumeModal();
+  }
+  
+  // Check if clicking outside download modal
+  if (event.target === downloadModal) {
+    closeDownloadSuccess();
+  }
+  
+  // Check if clicking outside main modal - FIXED: use .main-content-wrapper instead of .file-manager
+  if (mainModal && mainModal.style.display === 'block') {
+    const mainContent = mainModal.querySelector('.main-content-wrapper');
+    if (mainContent && !mainContent.contains(event.target)) {
+      flashTransition(mainModal, () => {
+        mainModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
     }
-    
-    // Close modals when clicking outside
-    window.addEventListener('click', function(event) {
-      const resumeModal = document.getElementById('resumeModal');
-      const downloadModal = document.getElementById('downloadSuccess');
-      const workModal = document.querySelector('.modal.work');
-      const aboutModal = document.querySelector('.modal.about');
-      const projectsModal = document.querySelector('.modal.projects');
-      const contactModal = document.querySelector('.modal.contact');
-      const overlay = document.querySelector('.overlay');
-      
-      // Check if clicking outside resume modal
-      if (event.target === resumeModal) {
-        closeResumeModal();
-      }
-      
-      // Check if clicking outside download modal
-      if (event.target === downloadModal) {
-        closeDownloadSuccess();
-      }
-      
-      // Check if clicking outside main modals (work, about, projects, contact)
-      if (workModal && workModal.style.display === 'block' && !workModal.querySelector('.file-manager').contains(event.target)) {
-        flashTransition(workModal, () => {
-          workModal.style.display = 'none';
-          if (overlay) overlay.style.display = 'none';
-        });
-      }
-      
-      if (aboutModal && aboutModal.style.display === 'block' && !aboutModal.querySelector('.file-manager').contains(event.target)) {
-        flashTransition(aboutModal, () => {
-          aboutModal.style.display = 'none';
-          if (overlay) overlay.style.display = 'none';
-        });
-      }
-      
-      if (projectsModal && projectsModal.style.display === 'block' && !projectsModal.querySelector('.file-manager').contains(event.target)) {
-        flashTransition(projectsModal, () => {
-          projectsModal.style.display = 'none';
-          if (overlay) overlay.style.display = 'none';
-        });
-      }
-      
-      if (contactModal && contactModal.style.display === 'block' && !contactModal.querySelector('.file-manager').contains(event.target)) {
-        flashTransition(contactModal, () => {
-          contactModal.style.display = 'none';
-          if (overlay) overlay.style.display = 'none';
-        });
-      }
-    });
-  </script>
+  }
+  
+  // Check if clicking outside other modals (work, about, projects, contact)
+  if (workModal && workModal.style.display === 'block') {
+    const workContent = workModal.querySelector('.file-manager');
+    if (workContent && !workContent.contains(event.target)) {
+      flashTransition(workModal, () => {
+        workModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
+  }
+  
+  if (aboutModal && aboutModal.style.display === 'block') {
+    const aboutContent = aboutModal.querySelector('.file-manager');
+    if (aboutContent && !aboutContent.contains(event.target)) {
+      flashTransition(aboutModal, () => {
+        aboutModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
+  }
+  
+  if (projectsModal && projectsModal.style.display === 'block') {
+    const projectsContent = projectsModal.querySelector('.file-manager');
+    if (projectsContent && !projectsContent.contains(event.target)) {
+      flashTransition(projectsModal, () => {
+        projectsModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
+  }
+  
+  if (contactModal && contactModal.style.display === 'block') {
+    const contactContent = contactModal.querySelector('.file-manager');
+    if (contactContent && !contactContent.contains(event.target)) {
+      flashTransition(contactModal, () => {
+        contactModal.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+      });
+    }
+  }
+});
+</script>
+
   <script>
     // Initialize loading mode - disable all interactions
     document.body.classList.add('loading-mode');
