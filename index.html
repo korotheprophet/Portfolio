@@ -665,6 +665,421 @@
       opacity: 0.95;
       transform: translate(-50%, -50%) scale(1.2);
     }
+
+    
+    /* Main Page Specific Styles - Made 200px smaller overall with centered content and LONGER vertical padding */
+.main-content-wrapper {
+  display: flex;
+  gap: 20px; /* Reduced from 40px */
+  height: 100%;
+  align-items: center;
+  justify-content: center; /* Center the content horizontally */
+  padding: 160px 80px; /* INCREASED vertical padding: 160px top/bottom, 80px left/right */
+}
+
+.main-left-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 200px; /* Constrain width */
+}
+
+.main-right-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 200px; /* Constrain width */
+}
+
+.main-profile-image {
+  width: 80px; /* Reduced from 150px */
+  height: 80px; /* Reduced from 150px */
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px; /* Reduced from 20px */
+  border: 2px solid #ff69b4; /* Reduced from 3px */
+  box-shadow: 0 2px 8px rgba(255, 105, 180, 0.3); /* Smaller shadow */
+}
+
+.main-header {
+  color: #ff69b4;
+  font-family: 'NinjaNaruto', Georgia, serif;
+  font-size: 1.2rem; /* Reduced from 2rem */
+  margin: 0 0 8px 0; /* Reduced from 15px */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-align: center; /* Ensure header is centered */
+}
+
+.main-description {
+  color: #ccc;
+  font-size: 10px; /* Reduced from 14px */
+  line-height: 1.3; /* Reduced from 1.6 */
+  font-family: Georgia, serif;
+  text-align: center; /* Changed from justify to center */
+  max-width: 180px; /* Reduced from 300px */
+  margin: 0 auto; /* Center the text block */
+}
+
+.main-navigation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px; /* Reduced from 30px */
+  padding: 10px; /* Reduced from 20px */
+  justify-items: center; /* Center grid items */
+}
+
+.main-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 8px; /* Reduced from 15px */
+  border-radius: 4px; /* Reduced from 8px */
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 100%; /* Ensure full width within grid cell */
+  text-align: center; /* Center content within nav item */
+}
+
+.main-nav-item:hover {
+  transform: translateY(-1px) scale(1.02); /* Reduced scale */
+  background: rgba(255, 105, 180, 0.1);
+  border-color: rgba(255, 105, 180, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 105, 180, 0.2); /* Smaller shadow */
+}
+
+.main-nav-icon {
+  width: 35px; /* Reduced from 60px */
+  height: 35px; /* Reduced from 60px */
+  position: relative;
+  margin: 0 auto 6px auto; /* Center icon and reduce bottom margin */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-nav-label {
+  color: #ccc;
+  font-size: 9px; /* Reduced from 12px */
+  font-weight: 500;
+  text-align: center;
+  font-family: 'NinjaNaruto', Georgia, serif;
+  transition: color 0.2s ease;
+}
+
+.main-nav-item:hover .main-nav-label {
+  color: #ff69b4;
+}
+
+/* Mini Document Icon for Work Experience - Scaled down and properly centered */
+.document-mini-icon {
+  width: 20px; /* Reduced from 25px */
+  height: 24px; /* Reduced from 30px */
+  position: relative;
+  margin: 0 auto; /* Center the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.document-mini-icon::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+  border: 1px solid #ccc; /* Reduced from 2px */
+  border-radius: 2px; /* Reduced from 3px */
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3); /* Smaller shadow */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.document-mini-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px; /* Adjusted width for centering */
+  height: 1px;
+  background: #666;
+  box-shadow: 0 2px 0 #666, 0 4px 0 #666, 0 6px 0 #666; /* Adjusted spacing */
+}
+
+/* Replace the existing flower styles in the main page section with this: */
+
+/* Flower icon for Projects - Made smaller and centered for MAIN PAGE ONLY */
+.main-nav-item .flower {
+  width: 20px; /* Reduced from 20px */
+  height: 20px; /* Reduced from 20px */
+  position: relative;
+  margin: 0 auto; /* Center the flower */
+}
+
+.main-nav-item .flower::before {
+  content: '';
+  position: absolute;
+  width: 15px; /* Reduced from 16px */
+  height: 17px; /* Reduced from 18px */
+  background: linear-gradient(180deg, #ff69b4 0%, #ff1493 100%);
+  border-radius: 7px 7px 2px 2px; /* Reduced from 8px 8px 2px 2px */
+  top: 1px; /* Adjusted positioning */
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 1px 4px rgba(255,105,180,0.4);
+}
+
+.main-nav-item .flower::after {
+  content: '';
+  position: absolute;
+  width: 8px; /* Reduced from 8px */
+  height: 3px; /* Reduced from 3px */
+  background: #8b4513;
+  border-radius: 2px; /* Reduced from 2px */
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+
+/* Keep the original flower styles for projects page unchanged */
+.folder-item .flower {
+  width: 60px;
+  height: 60px;
+  position: relative;
+}
+
+.folder-item .flower::before {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 50px;
+  background: linear-gradient(180deg, #ff69b4 0%, #ff1493 100%);
+  border-radius: 20px 20px 5px 5px;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 8px rgba(255,105,180,0.4);
+}
+
+.folder-item .flower::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 8px;
+  background: #8b4513;
+  border-radius: 4px;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Mini Contact Icon - Scaled down */
+.contact-mini-icon {
+  width: 25px; /* Reduced from 40px */
+  height: 25px; /* Reduced from 40px */
+  position: relative;
+  background: #ff69b4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; /* Center the icon */
+}
+
+.contact-mini-icon::before {
+  content: '@';
+  color: white;
+  font-size: 14px; /* Reduced from 20px */
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+}
+
+/* File Manager - Made smaller with better centering and INCREASED HEIGHT */
+.file-manager {
+  background: #3a3a3a;
+  border-radius: 8px; /* Reduced from 12px */
+  padding: 0;
+  width: 100%;
+  height: 450px; /* INCREASED from 300px to 450px */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Smaller shadow */
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Content area with better centering */
+.content-area {
+  padding: 20px;
+  background: #2a2a2a;
+  height: calc(100% - 40px);
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive adjustments for main page - Updated for smaller sizes with better centering and LONGER vertical padding */
+@media (max-width: 768px) {
+  .main-content-wrapper {
+    flex-direction: column;
+    gap: 15px; /* Reduced from 20px */
+    padding: 140px 60px; /* INCREASED vertical padding for mobile: 140px top/bottom */
+    justify-content: center;
+  }
+  
+  .main-navigation-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px; /* Reduced from 15px */
+    justify-items: center;
+  }
+  
+  .main-profile-image {
+    width: 60px; /* Reduced from 120px */
+    height: 60px; /* Reduced from 120px */
+  }
+  
+  .main-header {
+    font-size: 1rem; /* Reduced from 1.5rem */
+    text-align: center;
+  }
+  
+  .main-description {
+    font-size: 8px; /* Reduced from 12px */
+    max-width: 150px; /* Reduced from 250px */
+    text-align: center;
+    margin: 0 auto;
+  }
+  
+  .main-left-section,
+  .main-right-section {
+    max-width: none; /* Remove constraint on mobile */
+    align-items: center;
+  }
+  
+  /* INCREASED file manager height for mobile */
+  .file-manager {
+    height: 400px; /* INCREASED from 300px */
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-wrapper {
+    padding: 120px 50px; /* INCREASED vertical padding for small screens: 120px top/bottom */
+  }
+  
+  .main-navigation-grid {
+    grid-template-columns: 1fr;
+    gap: 6px; /* Reduced from 10px */
+    justify-items: center;
+  }
+  
+  .main-nav-icon {
+    width: 30px; /* Reduced from 50px */
+    height: 30px; /* Reduced from 50px */
+    margin: 0 auto 4px auto;
+  }
+  
+  .main-profile-image {
+    width: 50px; /* Reduced from 100px */
+    height: 50px; /* Reduced from 100px */
+  }
+  
+  .main-header {
+    font-size: 0.9rem; /* Further reduced */
+    text-align: center;
+  }
+  
+  .main-description {
+    font-size: 7px; /* Further reduced */
+    max-width: 120px; /* Further reduced */
+    text-align: center;
+    margin: 0 auto;
+  }
+  
+  /* INCREASED file manager height for small screens */
+  .file-manager {
+    height: 350px; /* INCREASED from 300px */
+  }
+}
+
+.main-navigation-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reduced from 30px */
+  padding: 10px; /* Reduced from 20px */
+  align-items: center; /* Center the nav items */
+}
+
+.main-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 8px; /* Reduced from 15px */
+  border-radius: 4px; /* Reduced from 8px */
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 80px; /* Fixed width for consistency */
+  text-align: center; /* Center content within nav item */
+}
+/* Notification styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(42, 42, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 105, 180, 0.3);
+  border-radius: 8px;
+  padding: 15px 20px;
+  color: #ff69b4;
+  font-family: 'NinjaNaruto', Georgia, serif;
+  font-size: 14px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 9998;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.5s ease;
+  max-width: 300px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+.notification.hide {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.notification::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff69b4, #ff1493, #ff69b4);
+  border-radius: 8px;
+  z-index: -1;
+  opacity: 0.3;
+  filter: blur(4px);
+}
+
   </style>
 </head>
 
@@ -675,7 +1090,7 @@
 <div class="modal main">
   <div class="file-manager">
     <div class="title-bar">
-      <h3>Portfolio - Main</h3>
+      <h3></h3>
     </div>
     
     <div class="content-area">
@@ -740,37 +1155,40 @@
 }
 
 .main-profile-image {
-  width: 150px;
-  height: 150px;
+  width: 100px; /* Increased from 80px */
+  height: 100px; /* Increased from 80px */
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 20px;
-  border: 3px solid #ff69b4;
-  box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+  margin-bottom: 12px; /* Slightly increased from 10px */
+  border: 2px solid #ff69b4;
+  box-shadow: 0 2px 8px rgba(255, 105, 180, 0.3);
 }
 
 .main-header {
   color: #ff69b4;
   font-family: 'NinjaNaruto', Georgia, serif;
-  font-size: 2rem;
-  margin: 0 0 15px 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 1.4rem; /* Increased from 1.2rem */
+  margin: 0 0 10px 0; /* Slightly increased from 8px */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-align: center;
 }
 
 .main-description {
   color: #ccc;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 11px; /* Increased from 10px */
+  line-height: 1.4; /* Slightly increased from 1.3 */
   font-family: Georgia, serif;
-  text-align: justify;
-  max-width: 300px;
+  text-align: center;
+  max-width: 200px; /* Increased from 180px */
+  margin: 0 auto;
 }
 
 .main-navigation-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reduced from 30px */
+  padding: 10px; /* Reduced from 20px */
+  align-items: center; /* Center the nav items */
 }
 
 .main-nav-item {
@@ -779,10 +1197,12 @@
   align-items: center;
   cursor: pointer;
   transition: transform 0.2s ease;
-  padding: 15px;
-  border-radius: 8px;
+  padding: 8px; /* Reduced from 15px */
+  border-radius: 4px; /* Reduced from 8px */
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 80px; /* Fixed width for consistency */
+  text-align: center; /* Center content within nav item */
 }
 
 .main-nav-item:hover {
@@ -815,11 +1235,15 @@
   color: #ff69b4;
 }
 
-/* Mini Document Icon for Work Experience */
+/* Mini Document Icon for Work Experience - Scaled down and properly centered */
 .document-mini-icon {
-  width: 40px;
-  height: 50px;
+  width: 20px; /* Reduced from 25px */
+  height: 24px; /* Reduced from 30px */
   position: relative;
+  margin: 0 auto; /* Center the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .document-mini-icon::before {
@@ -828,20 +1252,58 @@
   width: 100%;
   height: 100%;
   background: #f0f0f0;
-  border: 2px solid #ccc;
-  border-radius: 3px;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+  border: 1px solid #ccc; /* Reduced from 2px */
+  border-radius: 2px; /* Reduced from 3px */
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3); /* Smaller shadow */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .document-mini-icon::after {
   content: '';
   position: absolute;
-  top: 6px;
-  left: 6px;
-  right: 6px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px; /* Adjusted width for centering */
   height: 1px;
   background: #666;
-  box-shadow: 0 4px 0 #666, 0 8px 0 #666, 0 12px 0 #666;
+  box-shadow: 0 2px 0 #666, 0 4px 0 #666, 0 6px 0 #666; /* Adjusted spacing */
+}
+
+/* Flower icon for Projects - Made smaller and centered */
+.flower {
+  width: 20px; /* Reduced from 60px */
+  height: 20px; /* Reduced from 60px */
+  position: relative;
+  margin: 0 auto; /* Center the flower */
+}
+
+.flower::before {
+  content: '';
+  position: absolute;
+  width: 16px; /* Reduced proportionally */
+  height: 18px; /* Reduced proportionally */
+  background: linear-gradient(180deg, #ff69b4 0%, #ff1493 100%);
+  border-radius: 8px 8px 2px 2px; /* Reduced proportionally */
+  top: 2px; /* Adjusted positioning */
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 1px 4px rgba(255,105,180,0.4); /* Smaller shadow */
+}
+
+.flower::after {
+  content: '';
+  position: absolute;
+  width: 8px; /* Reduced proportionally */
+  height: 3px; /* Reduced proportionally */
+  background: #8b4513;
+  border-radius: 2px; /* Reduced proportionally */
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 1px 1px rgba(0,0,0,0.3); /* Smaller shadow */
 }
 
 /* Mini Contact Icon */
@@ -907,7 +1369,7 @@
     height: 100px;
   }
 }
-
+</body>
 
 
 <script>
@@ -1030,6 +1492,13 @@ window.addEventListener('click', function(event) {
       <button class="enter-btn">Enter</button>
     </div>
   </div>
+
+  <!-- Add this HTML element after the loading screen div -->
+  <!-- Notification -->
+  <div class="notification" id="scrollNotification">
+    What you seek, you shall find in the scrolls.
+  </div>
+
   <div class="modal work">
     <div class="file-manager">
       <div class="title-bar">
@@ -1132,7 +1601,7 @@ window.addEventListener('click', function(event) {
           
           <div class="contact-icon" onclick="window.open('https://www.facebook.com/korodotcom/', '_blank')">
             <svg viewBox="0 0 24 24" fill="#ff69b4">
-              <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
             </svg>
           </div>
           
@@ -1236,28 +1705,42 @@ window.addEventListener('click', function(event) {
       }, 5000);
     }
     
-    document.getElementById('enter-button').addEventListener('click', () => {
-      // Create flash effect
-      const flash = document.createElement('div');
-      flash.className = 'flash';
-      document.body.appendChild(flash);
+    // Replace the existing enter button click handler with this updated version
+
+document.getElementById('enter-button').addEventListener('click', () => {
+  // Create flash effect
+  const flash = document.createElement('div');
+  flash.className = 'flash';
+  document.body.appendChild(flash);
+  
+  // Flash animation
+  flash.style.opacity = '1';
+  setTimeout(() => {
+    flash.style.opacity = '0';
+    flash.style.transition = 'opacity 0.3s ease';
+  }, 100);
+  
+  // Hide loading screen
+  setTimeout(() => {
+    document.getElementById('loading-screen').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+      if (flash.parentNode) document.body.removeChild(flash);
       
-      // Flash animation
-      flash.style.opacity = '1';
+      // Show notification after loading screen is hidden
       setTimeout(() => {
-        flash.style.opacity = '0';
-        flash.style.transition = 'opacity 0.3s ease';
-      }, 100);
-      
-      // Hide loading screen
-      setTimeout(() => {
-        document.getElementById('loading-screen').style.opacity = '0';
+        const notification = document.getElementById('scrollNotification');
+        notification.classList.add('show');
+        
+        // Hide notification after 4 seconds
         setTimeout(() => {
-          document.getElementById('loading-screen').style.display = 'none';
-          if (flash.parentNode) document.body.removeChild(flash);
-        }, 1000);
-      }, 200);
-    });
+          notification.classList.remove('show');
+          notification.classList.add('hide');
+        }, 4000);
+      }, 500);
+    }, 1000);
+  }, 200);
+});
     
     window.addEventListener('load', () => {
       startPetalAnimation();
