@@ -167,9 +167,21 @@ const canvas = document.querySelector("#experience-canvas")
 const sizes = { width: window.innerWidth, height: window.innerHeight }
 
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 200)
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
-renderer.setSize(sizes.width, sizes.height)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.querySelector('#bg'),
+  antialias: false, // Disable for better performance
+  powerPreference: "high-performance",
+  stencil: false,
+  depth: true
+})
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // Cap pixel ratio
+renderer.setSize(window.innerWidth, window.innerHeight)
+renderer.shadowMap.enabled = false // Disable shadows for performance
+renderer.outputColorSpace = THREE.SRGBColorSpace
+
+// Enable performance optimizations
+renderer.info.autoReset = false
 
 // Add lighting
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
@@ -179,7 +191,7 @@ directionalLight.position.set(10, 10, 5)
 scene.add(directionalLight)
 
 // Falling Particles System
-class FallingParticle {
+class CherryBlossom {
   constructor() {
     const geometry = new THREE.SphereGeometry(0.05, 6, 6)
     const material = new THREE.MeshBasicMaterial({
@@ -218,6 +230,28 @@ class FallingParticle {
 }
 
 // Firefly System
+class FireflySystem {
+  constructor(count) {
+    this.fireflies = []
+    for (let i = 0; i < count; i++) {
+      this.fireflies.push(new Firefly())
+    }
+  }
+
+  getMesh() {
+    const group = new THREE.Group()
+    this.fireflies.forEach(firefly => {
+      group.add(firefly.mesh)
+      group.add(firefly.light)
+    })
+    return group
+  }
+
+  update() {
+    this.fireflies.forEach(firefly => firefly.update())
+  }
+}
+
 class Firefly {
   constructor() {
     const geometry = new THREE.SphereGeometry(0.08, 8, 8)
@@ -259,21 +293,74 @@ class Firefly {
   }
 }
 
-// Create particles and fireflies
-const particles = []
-for (let i = 0; i < 50; i++) {
-  const particle = new FallingParticle()
-  particles.push(particle)
-  scene.add(particle.mesh)
+// Adaptive Quality Settings
+class AdaptiveQuality {
+  constructor() {
+    this.quality = this.detectDeviceCapability()
+    this.applyQualitySettings()
+  }
+  
+  detectDeviceCapability() {
+    const canvas = document.createElement('canvas')
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+    
+    if (!gl) return 'low'
+    
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info')
+    const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : ''
+    
+    // Detect mobile devices
+    if (/Mobile|Android|iPhone|iPad/.test(navigator.userAgent)) {
+      return 'low'
+    }
+    
+    // Detect integrated graphics
+    if (renderer.includes('Intel') || renderer.includes('Mali') || renderer.includes('Adreno')) {
+      return 'medium'
+    }
+    
+    return 'high'
+  }
+  
+  applyQualitySettings() {
+    switch (this.quality) {
+      case 'low':
+        this.maxCherryBlossoms = 20
+        this.maxFireflies = 5
+        this.updateInterval = 3
+        break
+      case 'medium':
+        this.maxCherryBlossoms = 35
+        this.maxFireflies = 10
+        this.updateInterval = 2
+        break
+      case 'high':
+        this.maxCherryBlossoms = 50
+        this.maxFireflies = 15
+        this.updateInterval = 1
+        break
+    }
+  }
 }
 
+const adaptiveQuality = new AdaptiveQuality()
+
+// Reduce particle counts for better performance
+const cherryBlossoms = []
+const maxCherryBlossoms = window.innerWidth < 768 ? 30 : 50 // Reduced from higher numbers
+
 const fireflies = []
-for (let i = 0; i < 35; i++) {
-  const firefly = new Firefly()
-  fireflies.push(firefly)
-  scene.add(firefly.mesh)
-  scene.add(firefly.light)
+const maxFireflies = window.innerWidth < 768 ? 8 : 15 // Reduced from higher numbers
+
+// Initialize with reduced counts
+for (let i = 0; i < maxCherryBlossoms; i++) {
+  cherryBlossoms.push(new CherryBlossom())
+  scene.add(cherryBlossoms[i].mesh)
 }
+
+// Use the new FireflySystem
+const fireflySystem = new FireflySystem(maxFireflies)
+scene.add(fireflySystem.getMesh())
 
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
@@ -439,17 +526,69 @@ canvas.addEventListener('mousemove', (event) => {
   pointer.y = -(event.clientY / sizes.height) * 2 + 1
 })
 
-function animate() {
+let lastTime = 0
+const targetFPS = 60
+const frameInterval = 1000 / targetFPS
+
+function updateCamera() {
+  controls.update()
+}
+
+class PerformanceMonitor {
+  constructor() {
+    this.frameCount = 0
+    this.lastTime = performance.now()
+    this.fps = 60
+  }
+  
+  update() {
+    this.frameCount++
+    const currentTime = performance.now()
+    
+    if (currentTime - this.lastTime >= 1000) {
+      this.fps = this.frameCount
+      this.frameCount = 0
+      this.lastTime = currentTime
+      
+      // Auto-adjust quality based on FPS
+      if (this.fps < 30) {
+        this.reduceQuality()
+      }
+    }
+  }
+  
+  reduceQuality() {
+    // Reduce particle counts if FPS is too low
+    if (cherryBlossoms.length > 20) {
+      const toRemove = cherryBlossoms.splice(20)
+      toRemove.forEach(blossom => scene.remove(blossom.mesh))
+    }
+  }
+}
+
+const performanceMonitor = new PerformanceMonitor()
+
+function animate(currentTime) {
   requestAnimationFrame(animate)
   
-  // Update controls
-  controls.update()
+  // Throttle frame rate
+  if (currentTime - lastTime < frameInterval) {
+    return
+  }
+  lastTime = currentTime
   
-  // Update particles
-  particles.forEach(particle => particle.update())
+  // Update particles less frequently
+  if (Math.floor(currentTime / 100) % 2 === 0) { // Every 200ms
+    cherryBlossoms.forEach(blossom => blossom.update())
+  }
   
-  // Update fireflies
-  fireflies.forEach(firefly => firefly.update())
+  if (Math.floor(currentTime / 50) % 2 === 0) { // Every 100ms
+    fireflySystem.update()
+  }
+  
+  // Always update camera and render
+  updateCamera()
+  renderer.render(scene, camera)
   
   // Raycasting
   raycaster.setFromCamera(pointer, camera)
@@ -475,8 +614,8 @@ function animate() {
   // Handle raycaster interaction
   handleRaycasterInteraction()
   
-  // Render
-  renderer.render(scene, camera)
+  // Update performance monitor
+  performanceMonitor.update()
 }
 
 animate()

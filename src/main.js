@@ -433,50 +433,151 @@ class FallingParticle {
 }
 
 // Firefly System
-class Firefly {
-  constructor() {
-    const geometry = new THREE.SphereGeometry(0.08, 8, 8)
+class FireflySystem {
+  constructor(count = 15) { // Reduced from default
+    this.count = count
+    this.positions = new Float32Array(count * 3)
+    this.velocities = []
+    this.blinkTimers = new Float32Array(count)
+    
+    // Use instanced mesh for better performance
+    const geometry = new THREE.SphereGeometry(0.06, 6, 6) // Reduced segments
     const material = new THREE.MeshBasicMaterial({
       color: 0xffff88,
       transparent: true,
       opacity: 0.8
     })
-    this.mesh = new THREE.Mesh(geometry, material)
-    this.light = new THREE.PointLight(0xffff88, 1, 5)
     
-    this.position = new THREE.Vector3(
-      35 + (Math.random() - 0.5) * 20,  // Keep X position at 35
-      -55 + Math.random() * 5,          // Updated Y to match model at -60 (range -60 to -55, staying above model)
-      10 + (Math.random() - 0.5) * 20
-    )
-    this.velocity = new THREE.Vector3(
-      (Math.random() - 0.5) * 0.015,    // Increased from 0.005 to 0.015
-      (Math.random() - 0.5) * 0.008,   // Increased from 0.002 to 0.008
-      (Math.random() - 0.5) * 0.015    // Increased from 0.005 to 0.015
-    )
-    this.blinkTimer = Math.random() * Math.PI * 2
+    this.instancedMesh = new THREE.InstancedMesh(geometry, material, count)
+    this.instancedMesh.frustumCulled = true
+    
+    // Initialize fireflies
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3
+      this.positions[i3] = 35 + (Math.random() - 0.5) * 20
+      this.positions[i3 + 1] = -55 + Math.random() * 5
+      this.positions[i3 + 2] = 10 + (Math.random() - 0.5) * 20
+      
+      this.velocities.push(new THREE.Vector3(
+        (Math.random() - 0.5) * 0.01, // Reduced movement
+        (Math.random() - 0.5) * 0.005,
+        (Math.random() - 0.5) * 0.01
+      ))
+      
+      this.blinkTimers[i] = Math.random() * Math.PI * 2
+    }
   }
-  
+
   update() {
-    this.position.add(this.velocity)
-    this.blinkTimer += 0.05
+    const matrix = new THREE.Matrix4()
+    const center = new THREE.Vector3(35, -55, 10)
     
-    // Keep near model - updated center position Y to -60
-    const center = new THREE.Vector3(35, -55, 10) // Model center position with Y at -60
-    if (this.position.distanceTo(center) > 15) {
-      this.velocity.add(center.clone().sub(this.position).normalize().multiplyScalar(0.0002)) // Much slower attraction - reduced from 0.0005 to 0.0002
+    for (let i = 0; i < this.count; i++) {
+      const i3 = i * 3
+      const position = new THREE.Vector3(
+        this.positions[i3],
+        this.positions[i3 + 1],
+        this.positions[i3 + 2]
+      )
+      
+      position.add(this.velocities[i])
+      
+      // Simplified attraction
+      if (position.distanceTo(center) > 15) {
+        const attraction = center.clone().sub(position).normalize().multiplyScalar(0.0001)
+        this.velocities[i].add(attraction)
+      }
+      
+      // Random direction change (less frequent)
+      if (Math.random() < 0.01) {
+        this.velocities[i].multiplyScalar(-1)
+      }
+      
+      this.positions[i3] = position.x
+      this.positions[i3 + 1] = position.y
+      this.positions[i3 + 2] = position.z
+      
+      // Update blink timer
+      this.blinkTimers[i] += 0.02 // Reduced frequency
+      
+      // Set instance matrix
+      matrix.setPosition(position)
+      this.instancedMesh.setMatrixAt(i, matrix)
     }
     
-    this.mesh.position.copy(this.position)
-    this.light.position.copy(this.position)
-    
-    const blink = 0.3 + 0.7 * Math.abs(Math.sin(this.blinkTimer))
-    this.mesh.material.opacity = blink
-    this.light.intensity = blink * 1.5
+    this.instancedMesh.instanceMatrix.needsUpdate = true
+  }
+
+  getMesh() {
+    return this.instancedMesh
   }
 }
 
-// Create particles and fireflies
+// Cherry Blossom System
+class CherryBlossom {
+  constructor() {
+    // Use simpler geometry and shared materials
+    const geometry = new THREE.PlaneGeometry(0.3, 0.3)
+    const material = CherryBlossom.getSharedMaterial()
+    this.mesh = new THREE.Mesh(geometry, material)
+    
+    this.position = new THREE.Vector3(
+      (Math.random() - 0.5) * 100,
+      20 + Math.random() * 10,
+      (Math.random() - 0.5) * 100
+    )
+    this.velocity = new THREE.Vector3(
+      (Math.random() - 0.5) * 0.02,
+      -0.05 - Math.random() * 0.03,
+      (Math.random() - 0.5) * 0.02
+    )
+    this.rotationSpeed = (Math.random() - 0.5) * 0.02
+    this.blinkTimer = Math.random() * Math.PI * 2
+    
+    this.mesh.position.copy(this.position)
+    this.mesh.frustumCulled = true // Enable frustum culling
+  }
+
+  static getSharedMaterial() {
+    if (!CherryBlossom.sharedMaterial) {
+      CherryBlossom.sharedMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffb6c1,
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide
+      })
+    }
+    return CherryBlossom.sharedMaterial
+  }
+
+  update() {
+    this.mesh.position.add(this.velocity)
+    this.mesh.rotation.z += this.rotationSpeed
+    
+    // Optimize blinking - update less frequently
+    this.blinkTimer += 0.03 // Reduced from 0.1
+    const shimmer = 0.5 + 0.5 * Math.sin(this.blinkTimer)
+    const blink = Math.sin(this.blinkTimer * 0.5) > 0.3 ? 1 : 0.3
+    this.mesh.material.opacity = shimmer * blink * 0.6 // Reduced opacity for performance
+    
+    if (this.mesh.position.y < -10) this.reset()
+  }
+
+  reset() {
+    this.mesh.position.set(
+      (Math.random() - 0.5) * 100,
+      20 + Math.random() * 10,
+      (Math.random() - 0.5) * 100
+    )
+    this.velocity.set(
+      (Math.random() - 0.5) * 0.02,
+      -0.05 - Math.random() * 0.03,
+      (Math.random() - 0.5) * 0.02
+    )
+  }
+}
+
+// Create particles, fireflies, and cherry blossoms
 const particles = []
 for (let i = 0; i < 50; i++) {
   const particle = new FallingParticle()
@@ -484,12 +585,14 @@ for (let i = 0; i < 50; i++) {
   scene.add(particle.mesh)
 }
 
-const fireflies = []
-for (let i = 0; i < 80; i++) {  // Increased from 35 to 80
-  const firefly = new Firefly()
-  fireflies.push(firefly)
-  scene.add(firefly.mesh)
-  scene.add(firefly.light)
+const fireflySystem = new FireflySystem(80) // Increased from 35 to 80
+scene.add(fireflySystem.getMesh())
+
+const cherryBlossoms = []
+for (let i = 0; i < 100; i++) {  // Added cherry blossoms
+  const cherryBlossom = new CherryBlossom()
+  cherryBlossoms.push(cherryBlossom)
+  scene.add(cherryBlossom.mesh)
 }
 
 const controls = new OrbitControls(camera, renderer.domElement)
@@ -731,9 +834,10 @@ window.addEventListener("click", handleRaycasterInteraction)
 function animate() {
   requestAnimationFrame(animate)
   
-  // Update particles and fireflies
+  // Update particles, fireflies, and cherry blossoms
   particles.forEach(particle => particle.update())
-  fireflies.forEach(firefly => firefly.update())
+  fireflySystem.update()
+  cherryBlossoms.forEach(cherryBlossom => cherryBlossom.update())
   
   if (!isModalOpen) {
     raycaster.setFromCamera(pointer, camera)

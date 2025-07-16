@@ -1981,6 +1981,31 @@ window.addEventListener('click', function(event) {
           }
         });
       }
+
+    // ADD THE PROJECT 1 LINK CODE HERE:
+    // Find the first folder item (Project 1) and add click event
+    const projectsModal = document.querySelector('.modal.projects');
+    if (projectsModal) {
+      const folderItems = projectsModal.querySelectorAll('.folder-item');
+      if (folderItems.length > 0) {
+        const project1 = folderItems[0]; // First project is Project 1
+        project1.addEventListener('click', function(e) {
+          e.stopPropagation(); // Prevent modal from closing
+          window.open('https://dottedstudios.vercel.app/', '_blank');
+        });
+        
+        // Add hover effect to indicate it's clickable
+        project1.style.cursor = 'pointer';
+        project1.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-5px) scale(1.05)';
+          this.style.transition = 'all 0.3s ease';
+        });
+        
+        project1.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      }
+    }
     });
   </script>
 </body>
