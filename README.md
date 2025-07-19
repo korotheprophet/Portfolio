@@ -376,13 +376,5 @@ When using this template:
 
 **3D Models**: Based on modified third-party assets. Original models are freely available for use in other projects.
 
-## 📞 Support & Contact
-
-### Contact Information
-- **Developer**: Jedidiah T. Rollinas
-- **Email**: jedidiahrollinas8245@gmail.com
-- **LinkedIn**: [Profile Link](https://www.linkedin.com/in/jedidiah-rollinas)
-
 ---
 
-*Built with ❤️ and lots of ☕ by Jedidiah T. Rollinas*
