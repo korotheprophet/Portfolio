@@ -1,4 +1,4 @@
-# 🌸 Interactive 3D Portfolio - Jedidiah Rollinas
+# 🌸 Interactive 3D Portfolio 
 
 A stunning, interactive 3D portfolio website featuring cherry blossom animations, ambient audio, and immersive Three.js experiences.
 
